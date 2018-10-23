@@ -6,3 +6,5 @@ nasm tools/
 NASM64/
 CLRFILE.CV4
 CURRENT.STS
+*.exe
+*.obj
