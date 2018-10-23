@@ -6,12 +6,12 @@
 code segment para public 'code'
 .486
 
-	public hexToOct, getsize
+	public hexToOct
 
 	; Возвращает размер строки в СX
 	; Параметры: SI - адрес строки
 	getsize proc far 
-		
+		 
 		xor cx, cx
 		getsizeLoop:
 		

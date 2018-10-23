@@ -35,7 +35,14 @@ code segment para public 'code'
 assume ds:data, ss:stack, cs:code
 .486		
 	
-	extrn hexToOct: far, inputHex: far, parseHex: far, printOutput: far
+	extrn hexToOct: far
+
+	printOutput proc 
+		
+		ret
+		
+	printOutput endp
+
 
 	print macro arg:REQ
 		mov ah, 09h
@@ -43,7 +50,7 @@ assume ds:data, ss:stack, cs:code
 		int 21h
 	endm
 
-	_main:	
+	main:	
 		mov ax, data
 		mov ds, ax
 		
@@ -52,7 +59,6 @@ assume ds:data, ss:stack, cs:code
 		; ввод числа
 		lea si, bufferMax
 		push si
-		call inputHex
 		
 		print newLine
 		print successMsg
@@ -60,7 +66,7 @@ assume ds:data, ss:stack, cs:code
 		
 		; чтение числа из строки
 		lea si, buffer
-		call parseHex
+	
 		mov input, ebx
 		
 		; проверка на ошибку
@@ -117,4 +123,4 @@ assume ds:data, ss:stack, cs:code
 		int	21h		
 		
 code ends
-end _main
+end main
