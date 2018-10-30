@@ -6,12 +6,12 @@
 code segment para public 'code'
 .486
 
-	public hexToOct
+	public wordToTernary
 
 	; Возвращает размер строки в СX
 	; Параметры: SI - адрес строки
 	getsize proc far 
-		 
+		
 		xor cx, cx
 		getsizeLoop:
 		
@@ -59,8 +59,8 @@ code segment para public 'code'
 	
 	reverse endp
 	
-	; Конвертирует шестнадцатеричное число в восьмеричное. 
-	hexToOct proc far
+	; Конвертирует слово в 3-чное символьное представление. 
+	wordToTernary proc far
 		
 		push bp
 		mov bp,sp
@@ -70,12 +70,12 @@ code segment para public 'code'
 		push di
 		push si
 		mov ebx, [bp+6]	  	 ; исходное значение
-		mov di, [bp+10]      ; адрес строки результата
+		mov di, [bp+7]      ; адрес строки результата
 		mov si, di
 		
 		;==================================================
 		push eax			; ЕАХ - текущий символ
-		hexToOctLoop:
+		wordToTernaryLoop:
 		
 			mov eax, ebx	; остаток от деления на 8
 			and ax, 7
@@ -87,7 +87,7 @@ code segment para public 'code'
 			shr ebx, 3
 			cmp ebx, 0
 		
-		jne hexToOctLoop
+		jne wordToTernaryLoop
 		pop eax
 		
 		call reverse
@@ -98,7 +98,7 @@ code segment para public 'code'
 		pop bp
 		ret 6
 		
-	hexToOct endp
+	wordToTernary endp
 
 code ends
 end

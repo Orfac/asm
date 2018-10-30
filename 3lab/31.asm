@@ -11,18 +11,11 @@ stack ends
 	
 data segment para public 'data'	
 	
-	input dd ?
+	value DWORD 231
+
 	output db 12 DUP('$'), '$'
 	
-	bufferMax db 9
-	bufferLen db ?
-	buffer db 10 DUP('$')		
-	
-	inputMsg db 'Input hex number:  ', '$'
 	resultMsg db 'Result: ', '$'
-	successMsg db 'You entered: ', '$'
-	parseErrMsg db 'Error: incorrect hex number format', '$'
-	sizeErrMsg db 'Error: input must be a DWORD', '$'
 	
 	newLine db 10, 13, '$'
 	
@@ -35,7 +28,7 @@ code segment para public 'code'
 assume ds:data, ss:stack, cs:code
 .486		
 	
-	extrn hexToOct: far
+	extrn wordToTernary: far
 
 	printOutput proc 
 		
@@ -54,51 +47,23 @@ assume ds:data, ss:stack, cs:code
 		mov ax, data
 		mov ds, ax
 		
-		print inputMsg
+		; Проверяем число на 0
+		cmp value, 0
+		jge converting
+		not value
+		inc value
 		
-		; ввод числа
-		lea si, bufferMax
+		converting:
+		lea si, output
 		push si
-		
-		print newLine
-		print successMsg
-		print buffer
-		
-		; чтение числа из строки
-		lea si, buffer
-	
-		mov input, ebx
-		
+		push value
+		call wordToTernary
 		; проверка на ошибку
 		cmp ax, 0
 		je noError
 		cmp ax, 1
 		je mainParseError
-		
-		; Некорректный размер
-		print newLine
-		print sizeErrMsg
-		jmp mainEnd
-		
-		; Некорректный формат
-		mainParseError:
-		print newLine
-		print parseErrMsg
-		jmp mainEnd
-		
-		noError:
-		; проверка на отрицательность
-		cmp input, 0
-		jge formResult
-		not input
-		inc input
-		
-		formResult:
-		; формирование результата
-		lea si, output
-		push si
-		push input
-		call hexToOct
+	
 		
 		print newLine
 		print resultMsg
