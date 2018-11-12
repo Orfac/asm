@@ -1,3 +1,3 @@
-ml /c 31.asm
+ml /c main.asm
 ml /c 32.asm
-link16 31.obj 32.obj;
+link16 main.obj 32.obj ;

@@ -1,8 +1,3 @@
-; Вариант 3 (вспомогательный модуль)
-; Преобразовать данные  представленные  в  шестнадцатеричном  виде (DWORD) в  восьмеричное число без знака в символьной форме. 
-; Число параметров 2.  Первый - исходное значение.  Второй - адрес,  начиная с которого размещается результат.
-; ==========================================================================================
-
 code segment para public 'code'
 .486
 
@@ -58,8 +53,7 @@ code segment para public 'code'
 		ret
 	
 	reverse endp
-	
-	; Конвертирует слово в 3-чное символьное представление. 
+	; Конвертирует число в десятиричное. 
 	wordToTernary proc far
 		
 		push bp
@@ -69,29 +63,25 @@ code segment para public 'code'
 		push ebx
 		push di
 		push si
-		mov ebx, [bp+6]	  	 ; исходное значение
-		mov di, [bp+7]      ; адрес строки результата
-		mov si, di
-		
+		mov bx, [bp+6]	  	 ; исходное значение
+		mov di, [bp+8]      ; адрес строки результата
 		;==================================================
-		push eax			; ЕАХ - текущий символ
+		push ax			; ЕАХ - текущий символ
+		mov ax, bx
 		wordToTernaryLoop:
-		
-			mov eax, ebx	; остаток от деления на 8
-			and ax, 7
-			add ax, '0'		; преобразование в символ
-		
-			mov [di], al		; dest[i] = ax; i++
+			mov bx, 3
+			div bx
+			add dx, '0'		; преобразование в символ	
+			mov [di], dx		; dest[i] = bx; i++
+			mov dx, 0
 			inc di
+			cmp ax, 0
+		jg wordToTernaryLoop	
 			
-			shr ebx, 3
-			cmp ebx, 0
-		
-		jne wordToTernaryLoop
-		pop eax
+		pop ax
 		
 		call reverse
-		
+
 		pop si
 		pop di
 		pop ebx
