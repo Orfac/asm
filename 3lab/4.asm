@@ -8,36 +8,37 @@ code segment para public 'code'
 		push cx
 		push si
 		
-		xor ebx, ebx
+		mov cx, bx
+		xor bx, bx
 		
 		cld
 		mov di, 0
-		mov cx, 1
 		parseWordLoop:
-			xor eax, eax	
+			xor ax, ax	
 			mov al, [si] ; Al = input[i]
 
 			; получаем значение
 			cmp ax, '0'
 			jl exception
 			cmp ax, '9'
-			jl WordDigitValue
+			jle WordDigitValue
 			
 			exception:
 			mov ax, 1	; return code = 1 (ERROR)
 			jmp	parseWordEnd
 
 			WordDigitValue:
-			imul ebx, 16
-			sub eax, 48
+			sub ax, 48
+			imul bx, 10
+			
 			; добавляем к сумме
-			add ebx, eax
+			add bx, ax
 
-			inc di
 			inc si
-			cmp di, 8
-			je parseEndWithZero
-		jmp parseWordLoop
+			dec cx
+			cmp cx, 0
+		jg parseWordLoop
+		jmp parseEndWithZero
 
 		setMinus:
 		mov cx, 1
@@ -65,49 +66,27 @@ code segment para public 'code'
 		push dx
 
 		;открываем файл
-        mov  ah,  30h  ;  open file
-		mov  al,  0    ; для чтения
+        mov ax,3d00h    ; открываем для чтения
         mov si, [bp + 8]     ; DS:dx указатель на имя файла
         lea dx, [si]     ; DS:dx указатель на имя файла
         int 21h     ; в ax деcкриптор файла
-		jc error1
-       
-	    
-	    mov bx,ax       ; находим длину файла
-		push ax
-		mov ah, 42h
-		mov al, 0
-		xor cx,cx
-        xor dx,dx
-        int 21h    
-		jc error1
-		push ax
-
-
-		mov ah, 42h		; ставим в начало
-		mov al, 0
-		xor cx,cx
-        xor dx,dx
-        int 21h    
-		jc error1
-
 		
+        mov bx,ax       ; копируем в bx указатель файла
+		xor cx,cx
+        xor dx,dx
+
+        mov ax,4200h
+        int 21h     ; идем к началу файла
 
         mov ah,3fh      ; будем читать из файла
-        pop cx
-		pop bx
-        mov dx, [bp + 6]     ; DS:dx указатель на буфер
-        push bx
-		int 21h 
-        
-		mov ah,3eh        ; закрываем файл, после чтения
-        pop bx
-		int 21h
-		jc error4
-		error1:
-		nop
-		
-		error4:
+        mov si, [bp + 10]
+        mov cx, [si]
+        mov dx, [bp + 6]     ; DS:dx указатель на имя файла
+        int 21h 
+		mov bx, ax
+        mov ah,3eh        ; закрываем файл, после чтения
+        int 21h
+		xor ax,ax
 		pop dx
 		pop bp
 		ret 4
@@ -133,14 +112,14 @@ code segment para public 'code'
 		mov ah, 09h
 		mov dx, [bp+8]
 		int 21h		
-		int 20h
+		; int 20h
 		
 		pop ax
 		pop dx
-		pop di
+		; pop di
 		
 		pop bp
-		ret 6
+		ret 
 		
 	printOutput endp
 code ends

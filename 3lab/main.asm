@@ -6,10 +6,10 @@ stack ends
 	
 data segment para public 'data'	
 	
-	input dd ?
+	input dw ?
 	output db 12 DUP('$'), '$'
 	
-	path db "input.txt",0 ; имя файла для открытия
+	path db "c:\3lab\input.txt",0 ; имя файла для открытия
 
 	bufferMax db 12
 	bufferLen db ?
@@ -49,15 +49,15 @@ assume ds:data, ss:stack, cs:code
 		lea si, buffer
 		push si
 		call inputWord
+		push bx
 		print newLine
 		print successMsg
 		print buffer
-		
-
-		
+		print newLine
+		pop bx
 		lea si, buffer
 		call parseWord
-		mov input, ebx
+		mov input, bx
 		cmp ax, 0
 		je noError
 		; проверка на ошибку

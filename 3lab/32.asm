@@ -60,7 +60,7 @@ code segment para public 'code'
 		mov bp,sp
 
 		; получение параметров из стека
-		push ebx
+		push bx
 		push di
 		push si
 		mov bx, [bp+6]	  	 ; исходное значение
@@ -70,6 +70,7 @@ code segment para public 'code'
 		mov ax, bx
 		wordToTernaryLoop:
 			mov bx, 3
+			xor dx, dx
 			div bx
 			add dx, '0'		; преобразование в символ	
 			mov [di], dx		; dest[i] = bx; i++
@@ -84,9 +85,9 @@ code segment para public 'code'
 
 		pop si
 		pop di
-		pop ebx
+		pop bx
 		pop bp
-		ret 6
+		ret 
 		
 	wordToTernary endp
 
