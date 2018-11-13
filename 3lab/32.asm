@@ -1,7 +1,7 @@
 code segment para public 'code'
 .486
 
-	public wordToTernary
+	public wordToTernary, getsize
 
 	; Возвращает размер строки в СX
 	; Параметры: SI - адрес строки
