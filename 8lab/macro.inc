@@ -133,7 +133,7 @@ local COUNT_LOOP, ONE_LAST, endd
 	xor edx, edx
 	
 	getElement
-	mov cx, 2
+	mov cx, 1
 	
 	COUNT_LOOP:
 		mov eax, ebx
