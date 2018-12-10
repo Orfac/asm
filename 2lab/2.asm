@@ -20,20 +20,11 @@ assume ds:data, ss:stack, cs:code
 main:
 		
 start:	  
-	
-	mov eax, 170
-	ror eax, 1
-	mov edx, 0 
-	mov ebx, 2
-	div ebx
-
-	ror eax, 1
-	and eax, WORD_MASK
-	cmp edx, 1
-	jne endd
-	or eax, HIGH_MASK 
-	endd:
-	xor eax, eax
+	xor ax, ax
+	mov     ah, 0Fh
+	int     10h		 
+	mov dl, ah
+	mov cl ,al
 	mov ax, 4c00h	
 	int	21h		
 
