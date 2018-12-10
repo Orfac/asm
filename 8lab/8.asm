@@ -36,10 +36,12 @@ WinMain proto :dword
 	wc2 WNDCLASSEX <?>		; Window class
 	
 .const
-	WORD_SIZE  equ 22
-	ITEM_COUNT equ 16
-	WORD_MASK  equ 11111111111111111111110000000000b
-	
+	WORD_SIZE EQU 17
+	ITEM_COUNT EQU 12
+	WORD_MASK EQU 11111111111111111000000000000000b
+	LOW_MASK EQU 00000000000000001000000000000000b
+	HIGH_MASK EQU 10000000000000000000000000000000b
+
 	WINDOW_WIDTH  equ 300
 	WINDOW_HEIGHT equ 380
 	WINDOW_X equ 600
@@ -128,12 +130,10 @@ Window&num proc hWnd:HWND, uMsg:UINT, wParam:WPARAM, lParam:LPARAM
 Window&num endp 
 endm
 makeResultElement proc uses cx dx
+	push edx
 	countSetBits
-	mov cx, WORD_SIZE
-	sub cx, dx
-	
-	mov ebx, WORD_MASK
-	shl ebx, cl
+	mov ebx, edx
+	pop edx
 
 	ret
 makeResultElement endp

@@ -25,7 +25,7 @@ local endRead
 	
 	; Проверяем, остались ли биты нашего элемента в следующем слове
 	; Если элемент начинается с бита < 11, то он целиком умещается в одно слово
-	cmp cx, 11
+	cmp cx, 16
 	jl endRead
 	push eax
 	
@@ -87,7 +87,7 @@ local endWrite
 	
 	; Проверяем, остались ли биты нашего элемента в следующем слове
 	; Если элемент начинается с бита < 11, то он целиком умещается в одно слово
-	cmp cx, 11
+	cmp cx, 16
 	jl endWrite
 	
 		; 32 - СХ = количество бит элемента, уместившееся в предыдущем слове
@@ -125,21 +125,35 @@ endm
 ;	EBX = элемент
 ;	CX = счётчик цикла
 countSetBits macro
-local COUNT_LOOP, zeroBit
+local COUNT_LOOP, ONE_LAST, endd
 	push ebx
 	push cx
-	xor dx, dx
+	push eax
+
+	xor edx, edx
 	
 	getElement
-	mov cx, WORD_SIZE
+	mov cx, 2
 	
 	COUNT_LOOP:
-		shl ebx, 1
-		jnc zeroBit
-		inc dx
-		zeroBit:
+		mov eax, ebx
+		and eax, LOW_MASK
+		cmp eax, 1
+		jg ONE_LAST
+		mov eax, ebx
+		ror eax, 1
+		and eax, WORD_MASK
+		jmp endd
+		ONE_LAST:
+		mov eax, ebx
+		ror eax, 1
+		and eax, WORD_MASK
+		or eax, HIGH_MASK
+		endd:
+		mov ebx, eax
 	loop COUNT_LOOP
-	
+	mov edx, ebx
+	pop eax
 	pop cx
 	pop ebx
 endm
