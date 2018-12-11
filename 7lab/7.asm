@@ -1,9 +1,9 @@
-; Вариант 18
-; Ряд: 1 + x*ln(a) + (x*ln(a))^2 / 2! + ... + (x*ln(a))^n / n!
-; Функция: a^x
+; Вариант 10
+; � яд: E(x^(2i + 1) / (2i-1)! )
+; Функция: sinx
 ; ==========================================================================================
 
-.386
+.686
 .model flat, stdcall
 option casemap: none
 include \masm32\include\windows.inc
@@ -50,12 +50,11 @@ endm
 	message2 db 'xEnd: ', 0
 	message3 db 'deltaX: ', 0
 	message4 db 'Precision: ', 0
-	message5 db 'Alpha: ', 0
 	
 	; Заголовки таблицы
 	header1 db 'Argument', 0
 	header2 db 'Series sum', 0
-	header3 db 'a^x', 0
+	header3 db 'sin(x)', 0
 	header4 db 'Element count', 0
 	
 	; Введённые значения
@@ -63,7 +62,6 @@ endm
 	finalX    dq ?
 	deltaX 	  dq ?
 	precision dq ?
-	alpha	  dq ?
 	
 	; Строка таблицы
 	function  dq ?
@@ -102,14 +100,10 @@ getSeriesSum proc uses eax
 	finit
 	
 	fld currentX	; x --> st(1)
-	fld alpha		; a --> st(0)
-	fyl2x 			; log2a*x
-	fldln2			; \ ln2*log2a*x = lna*x
-	fmul			; /
 	fstp lnax		; сохраняем значение lna*x
 	
 	fldz				; сумма = 0
-	fld1				; \ элемент = 1
+	fld currentX				; \ элемент = 1
 	fstp element		; /
 	
 @loop:  fld element 
@@ -117,12 +111,19 @@ getSeriesSum proc uses eax
 		inc count
 		
 		fld element		; \ 
-		fld lnax		;  | Умножаем элемент на lna*x
+		fld currentX		;  | Умножаем элемент на lna*x
 		fmul			; /
-		
+		fld currentX
+		fmul
+		fldz
+		fld1
+		fsub
+		fmul 
 		cmp count, 2	; Факториал растёт только после 2 элемента
 		jl @f
+		
 		fidiv count		; Делим на n
+		fidiv count	
 		
 @@:		fstp element
 		push offset precision
@@ -139,26 +140,11 @@ getSeriesSum endp
 
 ; Вычисляет значение функции a^x
 calcFunction proc
-	local trunc:dword
 	
 	finit
 	fld currentX	; x --> st(1)
-	fld alpha		; a --> st(0)
-	
-	; a^x = 2^(log2a*x)
-	fyl2x 		; log2a*x
-	fist trunc	; сохраняем целую часть логарифма	
-	fild trunc	; кладём её в стек FPU
-	fsub		; вычитаем из логарифма, получаем дробную часть
-	f2xm1 		; 2^decimalPart(log2a*x) - 1
-	fld1		; \ result++
-	fadd		; / 
-	fild trunc	; кладём целую часть в FPU
-    fxch		; swap(st0, st1)
-    fscale		; result * 2^trunc(log2a*x) = 2^(log2a*x) = a^x
-	
+	fsin
 	fstp function		; result --> function
-	
 	ret
 calcFunction endp
 
@@ -166,8 +152,12 @@ calcFunction endp
 compare proc uses eax X:dword, Y:dword 
 	mov eax, Y
 	fld qword ptr [eax]
+	fld qword ptr [eax]
+	fmul
 	mov eax, X
 	fld qword ptr [eax]
+	fld qword ptr [eax]
+	fmul
 	fcompp	 	; сравнение двух чисел и удаление их из стека
 	fstsw ax 	; сохраняем статусное слово в АХ
 	sahf		; загружаем содержимое АН в регистр флагов
@@ -257,8 +247,6 @@ Start:
 	input deltaX
 	printS message4
 	input precision
-	printS message5
-	input alpha
 	
 	print newline
 	call drawTable
