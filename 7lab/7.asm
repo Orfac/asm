@@ -109,16 +109,17 @@ getSeriesSum proc uses eax
 @loop:  fld element 
 		fadd
 		inc count
-		
-		fld element		; \ 
+
+		fldz
+		fld1
+		fsub
+		fld element	
+		fmul 
 		fld currentX		;  | Умножаем элемент на lna*x
 		fmul			; /
 		fld currentX
 		fmul
-		fldz
-		fld1
-		fsub
-		fmul 
+		
 		cmp count, 2	; Факториал растёт только после 2 элемента
 		jl @f
 		
