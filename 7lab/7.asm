@@ -1,5 +1,5 @@
 ; Вариант 10
-; � яд: E(x^(2i + 1) / (2i-1)! )
+; � яд: E(-1^n * x^(2i + 1) / (2i-1)! )
 ; Функция: sinx
 ; ==========================================================================================
 
@@ -94,46 +94,48 @@ endm
 ; Вычисляет сумму ряда и кол-во элементов
 getSeriesSum proc uses eax
 	local count: dword
-	local lnax: qword
-	
-	mov count, 0
+	local k: dword
+	local sinx : qword
+
+	mov count, 1
+	mov k, 0
 	finit
-	
-	fld currentX	; x --> st(1)
-	fstp lnax		; сохраняем значение lna*x
-	
-	fldz				; сумма = 0
+
+						; сумма = 0
 	fld currentX				; \ элемент = 1
 	fstp element		; /
-	
-@loop:  fld element 
+	fldz 
+	fstp sinx
+@loop:  fld sinx
+		fld element 
 		fadd
-		inc count
+		fstp sinx
 
+		inc k
 		fldz
 		fld1
 		fsub
 		fld element	
 		fmul 
-		fld currentX		;  | Умножаем элемент на lna*x
+		fld currentX		;  | Умножаем элемент на sin*x
 		fmul			; /
 		fld currentX
 		fmul
 		
-		cmp count, 2	; Факториал растёт только после 2 элемента
-		jl @f
-		
-		fidiv count		; Делим на n
-		fidiv count	
-		
-@@:		fstp element
+		inc count
+		fidiv count
+		inc count
+		fidiv count
+
+		fstp element
 		push offset precision
 		push offset element
 		call compare
 	ja @loop
-	
+
+	fld sinx
 	fstp seriesSum
-	fild count
+	fild k
 	fstp elemCount
 	
 	ret
